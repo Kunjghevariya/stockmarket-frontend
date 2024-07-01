@@ -5,10 +5,18 @@ function useWatchlist(run) {
 
     const fetchWatchlistData = async () => {
         try {
-            const response = await fetch('http://localhost:8001/api/v1/watchlist/', { credentials: "include" });
+            const token = localStorage.getItem('accessToken');
+            const response = await fetch('https://stockmarket-portfolio-backend.onrender.com/api/v1/watchlist/', {
+                credentials: "include",
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+
             if (!response.ok) {
                 throw new Error("Network response was not ok");
             }
+            
             const data = await response.json();
             setWatchlistData(data.stocks);
         } catch (error) {
