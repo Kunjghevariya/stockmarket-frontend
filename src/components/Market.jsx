@@ -148,7 +148,7 @@ const Market = ({ run, setrun }) => {
                     Buy
                   </button>
                   <button
-                    className="bg-red-500 text-white rounded-xl p-2 px-3mx-2 text-lg sm:text-xl"
+                    className="bg-red-500 text-white rounded-xl p-2 px-3 mx-1 text-lg sm:text-xl"
                     onClick={() => handleDelete(stock)}
                   >
                     X
