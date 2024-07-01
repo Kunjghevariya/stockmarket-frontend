@@ -37,7 +37,11 @@ const Signup = () => {
 
       console.log(response); 
       alert("Signup successful");
+<<<<<<< HEAD
       navigate('/');
+=======
+      navigate('/signin');
+>>>>>>> d5a072f3c0001d449f39267585b47ea3544a6ba9
     } catch (error) {
       console.error(error);
       alert("Signup failed");
