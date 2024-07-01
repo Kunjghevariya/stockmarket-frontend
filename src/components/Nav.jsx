@@ -6,9 +6,6 @@ import Searchbar from './searchbar';
 import Serchs from './Serchs';
 import Cookies from 'js-cookie';
 
-
-const token = Cookies.get('accessToken');
-
 const Nav = ({ run, setRun }) => {
   const location = useLocation();
   const [results, setResults] = useState([]);
@@ -16,9 +13,11 @@ const Nav = ({ run, setRun }) => {
   const [menuOpen, setMenuOpen] = useState(false);
   const navigate = useNavigate();
 
+  const token = localStorage.getItem('accessToken');
+
   const handleLogout = async () => {
     try {
-      const response = await axios.post('http://localhost:8001/api/v1/users/logout', null, {
+      const response = await axios.post('https://stockmarket-portfolio-backend.onrender.com/api/v1/users/logout', null, {
         headers: {
           Authorization: `Bearer ${token}`
         },
@@ -27,7 +26,7 @@ const Nav = ({ run, setRun }) => {
 
       console.log(response.data);
       alert("Logout successful");
-      Cookies.remove('accessToken');
+      localStorage.removeItem('accessToken');
       navigate('/signin');
     } catch (error) {
       console.error('Error logging out:', error);
@@ -35,14 +34,13 @@ const Nav = ({ run, setRun }) => {
     }
   };
 
-
   const handleAdd = async (stock) => {
     try {
-      const response = await fetch('http://localhost:8001/api/v1/watchlist/add', {
+      const response = await fetch('https://stockmarket-portfolio-backend.onrender.com/api/v1/watchlist/add', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': token
+          'Authorization': `Bearer ${token}`
         },
         credentials: 'include',
         body: JSON.stringify({ stockSymbol: stock }),
@@ -108,7 +106,6 @@ const Nav = ({ run, setRun }) => {
                 >
                   Portfolio
                 </Link>
-               
                 <Link
                   to="/news"
                   className={`px-3 py-2 rounded-md text-sm font-medium ${location.pathname === '/news' ? 'bg-gray-900 text-white' : 'text-gray-700 hover:bg-gray-700 hover:text-white'}`}
@@ -164,8 +161,8 @@ const Nav = ({ run, setRun }) => {
               *News
             </Link>
             <Link onClick={handleLogout} className="bg-violet-500 text-white rounded-xl p-3 hidden sm:block ">
-                Log out
-              </Link>
+              Log out
+            </Link>
           </div>
         </div>
       )}
