@@ -1,11 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import Chart from './Chart';
 import useWatchlist from './ContextApi/watchlist';
-import Cookies from 'js-cookie';
 import Modal from './Modal';
-
-const token = Cookies.get('accessToken');
-console.log(token);
 
 const Market = ({ run, setrun }) => {
   const [quantities, setQuantities] = useState([]);
@@ -33,12 +29,18 @@ const Market = ({ run, setrun }) => {
   }, [watchlistData]);
 
   const handleDelete = async (stock) => {
+    const token = localStorage.getItem('accessToken');
+    if (!token) {
+      console.error("No token found, cannot delete from watchlist.");
+      return;
+    }
+
     try {
-      const response = await fetch('http://localhost:8001/api/v1/watchlist/remove', {
+      const response = await fetch('https://stockmarket-portfolio-backend.onrender.com/api/v1/watchlist/remove', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `${token}`,
+          Authorization: `Bearer ${token}`,
         },
         credentials: 'include',
         body: JSON.stringify({ stockSymbol: stock }),
@@ -66,6 +68,7 @@ const Market = ({ run, setrun }) => {
   const handleModalSubmit = async () => {
     const { stock, type } = modalInfo;
     const { price, quantity } = modalInput;
+    const token = localStorage.getItem('accessToken');
 
     if (isNaN(quantity) || quantity <= 0 || (type === 'buy' && (isNaN(price) || price <= 0))) {
       alert('Error: Invalid input');
@@ -74,11 +77,11 @@ const Market = ({ run, setrun }) => {
 
     if (type === 'buy') {
       try {
-        const response = await fetch('http://localhost:8001/api/v1/portfolio/buy', {
+        const response = await fetch('https://stockmarket-portfolio-backend.onrender.com/api/v1/portfolio/buy', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            Authorization: `${token}`,
+            Authorization: `Bearer ${token}`,
           },
           credentials: 'include',
           body: JSON.stringify({ symbol: stock, quantity: parseInt(quantity, 10), purchasePrice: parseFloat(price) }),
@@ -94,11 +97,11 @@ const Market = ({ run, setrun }) => {
       }
     } else {
       try {
-        const response = await fetch('http://localhost:8001/api/v1/portfolio/sell', {
+        const response = await fetch('https://stockmarket-portfolio-backend.onrender.com/api/v1/portfolio/sell', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            Authorization: `${token}`,
+            Authorization: `Bearer ${token}`,
           },
           credentials: 'include',
           body: JSON.stringify({ symbol: stock, quantity: parseInt(quantity, 10) }),
@@ -130,7 +133,6 @@ const Market = ({ run, setrun }) => {
                 <div>
                   <h2 className="text-xl font-semibold">{stock}</h2>
                   <p className="text-gray-700">Price: {prices[stock] || 0}</p>
-
                 </div>
                 <div className="my-auto">
                   <button
@@ -164,34 +166,33 @@ const Market = ({ run, setrun }) => {
       </div>
 
       <Modal
-  show={modalInfo.show}
-  onClose={handleModalClose}
-  title={modalInfo.type === 'buy' ? 'Buy Stock' : 'Sell Stock'}
-  onSubmit={handleModalSubmit}
->
-  {modalInfo.type === 'buy' && (
-    <div className="mt-2">
-      <label className="block text-sm font-medium text-gray-700">Price:</label>
-      <input
-        type="number"
-        className="mt-1 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"
-        placeholder={prices[modalInfo.stock] || 0}
-        prefix={prices[modalInfo.stock] || 0}
-        value={modalInput.price}
-        onChange={(e) => setModalInput({ ...modalInput, price: e.target.value })}
-      />
-    </div>
-  )}
-  <div className="mt-2">
-    <label className="block text-sm font-medium text-gray-700">Quantity:</label>
-    <input
-      type="number"
-      className="mt-1 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"
-      value={modalInput.quantity}
-      onChange={(e) => setModalInput({ ...modalInput, quantity: e.target.value })}
-    />
-  </div>
-</Modal>
+        show={modalInfo.show}
+        onClose={handleModalClose}
+        title={modalInfo.type === 'buy' ? 'Buy Stock' : 'Sell Stock'}
+        onSubmit={handleModalSubmit}
+      >
+        {modalInfo.type === 'buy' && (
+          <div className="mt-2">
+            <label className="block text-sm font-medium text-gray-700">Price:</label>
+            <input
+              type="number"
+              className="mt-1 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"
+              placeholder={prices[modalInfo.stock] || 0}
+              value={modalInput.price}
+              onChange={(e) => setModalInput({ ...modalInput, price: e.target.value })}
+            />
+          </div>
+        )}
+        <div className="mt-2">
+          <label className="block text-sm font-medium text-gray-700">Quantity:</label>
+          <input
+            type="number"
+            className="mt-1 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"
+            value={modalInput.quantity}
+            onChange={(e) => setModalInput({ ...modalInput, quantity: e.target.value })}
+          />
+        </div>
+      </Modal>
     </>
   );
 };
