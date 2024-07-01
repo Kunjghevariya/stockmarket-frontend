@@ -4,7 +4,6 @@ import { BsFillPersonFill } from "react-icons/bs";
 import axios from 'axios';
 import { Link } from "react-router-dom";
 
-
 const Signin = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [username, setUsername] = useState("");
@@ -18,17 +17,22 @@ const Signin = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post('http://localhost:8001/api/v1/users/login', {
+      const response = await axios.post('https://stockmarket-portfolio-backend.onrender.com/api/v1/users/login', {
         username,
         password
       }, {
         withCredentials: true 
       });
 
-      console.log(response.data); 
-  
+      const { accessToken } = response.data.data;
+      
+      // Save the access token to localStorage
+      localStorage.setItem('accessToken', accessToken);
+
+      console.log(response.data); // Assuming the response contains user data or authentication token
+
       alert("Login successful");
-      navigate('/dashboard');
+      navigate('/dashboard'); // Redirect to the dashboard after successful login
     } catch (error) {
       console.error(error);
       alert("Invalid username or password");

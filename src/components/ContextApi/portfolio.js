@@ -1,21 +1,22 @@
 import { useState, useEffect } from "react";
-import Cookies from 'js-cookie';
 
-
-const token = Cookies.get('accessToken');
-console.log(token);
-
-function useportfolio() {
-    const [portfolio, setPortfolio] = useState({
-  
-    });
+function usePortfolio() {
+    const [portfolio, setPortfolio] = useState({});
 
     const fetchPortfolio = async () => {
         try {
-            const response = await fetch('http://localhost:8001/api/v1/portfolio/', { credentials: "include" });
+            const token = localStorage.getItem('accessToken');
+            const response = await fetch('https://stockmarket-portfolio-backend.onrender.com/api/v1/portfolio/', {
+                credentials: "include",
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+
             if (!response.ok) {
                 throw new Error("Network response was not ok");
             }
+            
             const data = await response.json();
             setPortfolio(data);
             console.log("Portfolio data fetched:", data);
@@ -27,6 +28,7 @@ function useportfolio() {
     useEffect(() => {
         fetchPortfolio();
     }, []);
+
     useEffect(() => {
         console.log("Portfolio data updated:", portfolio.holdings);
     }, [portfolio]); 
@@ -34,4 +36,4 @@ function useportfolio() {
     return [portfolio, fetchPortfolio];
 }
 
-export default useportfolio;
+export default usePortfolio;
