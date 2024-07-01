@@ -24,7 +24,7 @@ const Datait = ({ symbol, companyName, price, data, }) => (
   </div>
 );
 
-const Dashboard = () => {
+const Dashboard = (run, setrun) => {
   const [invested, setinvested] = useState(0)
   const [portfolio] = useportfolio();
   const [watchlistData, setWatchlist] = useWatchlist();
@@ -47,7 +47,7 @@ useEffect(() => {
   updatePrices();
   const interval = setInterval(updatePrices, 1000);
   return () => clearInterval(interval);
-}, [watchlistData]);
+}, [run]);
 
 
 

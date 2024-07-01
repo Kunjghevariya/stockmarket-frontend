@@ -136,19 +136,19 @@ const Market = ({ run, setrun }) => {
                 </div>
                 <div className="my-auto">
                   <button
-                    className="bg-red-500 text-white rounded-xl p-3 px-7 mx-2 text-lg sm:text-xl"
+                    className="bg-red-500 text-white rounded-xl p-2 px-3 mx-2 text-lg sm:text-xl"
                     onClick={() => handleModalOpen(stock, 'sell')}
                   >
                     Sell
                   </button>
                   <button
-                    className="bg-green-500 text-white rounded-xl p-3 mx-2 px-7 text-lg sm:text-xl"
+                    className="bg-green-500 text-white rounded-xl p-2 mx-2 px-3 text-lg sm:text-xl"
                     onClick={() => handleModalOpen(stock, 'buy')}
                   >
                     Buy
                   </button>
                   <button
-                    className="bg-red-500 text-white rounded-xl p-2 mx-2 text-lg sm:text-xl"
+                    className="bg-red-500 text-white rounded-xl p-2 px-3mx-2 text-lg sm:text-xl"
                     onClick={() => handleDelete(stock)}
                   >
                     X

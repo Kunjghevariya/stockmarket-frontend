@@ -37,7 +37,7 @@ const Signup = () => {
 
       console.log(response); 
       alert("Signup successful");
-      navigate('/dashboard');
+      navigate('/');
     } catch (error) {
       console.error(error);
       alert("Signup failed");
