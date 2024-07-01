@@ -26,7 +26,7 @@ const Signup = () => {
     }
 
     try {
-      const response = await axios.post('http://localhost:8001/api/v1/users/register', {
+      const response = await axios.post('https://stockmarket-portfolio-backend.onrender.com/api/v1/users/register', {
         fullname,
         email,
         username,
