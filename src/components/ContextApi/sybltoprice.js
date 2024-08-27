@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 
 const useFetchPrice = (symbol) => {
   const [price, setPrice] = useState(null);
-  const apiKey = 'ce297505eemsh4812b5289717005p12679bjsn9a2da41e0378';
+  const apiKey = 'e76dbecff5mshb31c0d084ee300fp193f62jsncc56175d94d4';
   const apiHost = 'apidojo-yahoo-finance-v1.p.rapidapi.com';
   const url = `https://apidojo-yahoo-finance-v1.p.rapidapi.com/market/v2/get-quotes?region=IN&symbols=${symbol}`;
 

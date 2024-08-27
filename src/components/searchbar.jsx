@@ -10,8 +10,8 @@ function Searchbar({setresult,setshowmenu,showMenu}) {
 	fetch(`https://apidojo-yahoo-finance-v1.p.rapidapi.com/auto-complete?q=${value}&region=IN`, {
         method: 'GET',
         headers: {
-          'X-RapidAPI-Key': 'ce297505eemsh4812b5289717005p12679bjsn9a2da41e0378',
-          'X-RapidAPI-Host': 'apidojo-yahoo-finance-v1.p.rapidapi.com'
+          'x-rapidapi-key': 'e76dbecff5mshb31c0d084ee300fp193f62jsncc56175d94d4',
+		'x-rapidapi-host': 'apidojo-yahoo-finance-v1.p.rapidapi.com'
         }
       }).then((response) => response.json()).then((json)=>{
         console.log(json);

@@ -8,6 +8,7 @@ const Signin = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false); // Loading state
   const navigate = useNavigate();
 
   const togglePasswordVisibility = () => {
@@ -16,6 +17,7 @@ const Signin = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true); // Start loading
     try {
       const response = await axios.post('https://stockmarket-portfolio-backend.onrender.com/api/v1/users/login', {
         username,
@@ -25,17 +27,18 @@ const Signin = () => {
       });
 
       const { accessToken } = response.data.data;
-      
-      // Save the access token to localStorage
+
       localStorage.setItem('accessToken', accessToken);
 
-      console.log(response.data); // Assuming the response contains user data or authentication token
+      console.log(response.data);
 
       alert("Login successful");
-      navigate('/dashboard'); // Redirect to the dashboard after successful login
+      navigate('/dashboard');
     } catch (error) {
       console.error(error);
       alert("Invalid username or password");
+    } finally {
+      setLoading(false); // End loading
     }
   };
 
@@ -55,6 +58,7 @@ const Signin = () => {
             value={username}
             onChange={(e) => setUsername(e.target.value)}
             className="border border-gray-300 rounded-md p-2"
+            disabled={loading} // Disable input when loading
           />
         </div>
         <div className="password relative">
@@ -65,11 +69,13 @@ const Signin = () => {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             className="border border-gray-300 rounded-md p-2 w-full"
+            disabled={loading} // Disable input when loading
           />
           <button
             type="button"
             onClick={togglePasswordVisibility}
             className="absolute right-2 top-2 bg-transparent text-sm text-violet-500"
+            disabled={loading} // Disable button when loading
           >
             {showPassword ? 'Hide' : 'Show'}
           </button>
@@ -78,8 +84,35 @@ const Signin = () => {
           <button
             type="submit"
             className='w-full bg-violet-500 text-white rounded-xl p-3'
+            disabled={loading} // Disable submit button when loading
           >
-            Submit
+            {loading ? (
+              <div className="flex justify-center items-center">
+                <svg
+                  className="animate-spin h-5 w-5 text-white mr-2"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                >
+                  <circle
+                    className="opacity-25"
+                    cx="12"
+                    cy="12"
+                    r="10"
+                    stroke="currentColor"
+                    strokeWidth="4"
+                  ></circle>
+                  <path
+                    className="opacity-75"
+                    fill="currentColor"
+                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                  ></path>
+                </svg>
+                Loading...
+              </div>
+            ) : (
+              "Submit"
+            )}
           </button>
         </div>
       </form>

@@ -4,58 +4,54 @@ import stockMarketNews from './data';
 import useportfolio from './ContextApi/portfolio';
 import useWatchlist from './ContextApi/watchlist';
 
-
 const NewsItem = ({ headline }) => (
   <div className="news-item bg-white p-4 m-2 rounded shadow-md w-full flex-shrink-0">
     <h2 className="font-bold text-lg">{headline}</h2>
   </div>
 );
 
-const Datait = ({ symbol, companyName, price, data, }) => (
+const Datait = ({ symbol, companyName, price }) => (
   <div className="flex justify-between bg-white p-4 m-2 rounded shadow-md w-full flex-shrink-0">
-    <div className="1">
+    <div>
       <h2 className="font-bold text-lg">{companyName}</h2>
       <h2 className="text-lg">{symbol}</h2>
     </div>
-    <div className="2">
+    <div>
       <h2 className="font-bold text-lg">${price}</h2>
-
     </div>
   </div>
 );
 
-const Dashboard = (run, setrun) => {
-  const [invested, setinvested] = useState(0)
+const Dashboard = ({ run, setrun }) => {
+  const [invested, setInvested] = useState(0);
   const [portfolio] = useportfolio();
-  const [watchlistData, setWatchlist] = useWatchlist();
-const [prices, setPrices] = useState({});
-const [data, setData] = useState([]);
+  const [watchlistData] = useWatchlist();
+  const [prices, setPrices] = useState({});
+  const [data, setData] = useState([]);
 
-const generateRandomPrice = () => {
-  return (Math.random() * (200 - 10) + 10).toFixed(2);
-};
+  const generateRandomPrice = () => {
+    return (Math.random() * (200 - 10) + 10).toFixed(2);
+  };
 
-const updatePrices = () => {
-  const newPrices = {};
-  watchlistData.forEach((stock) => {
-    newPrices[stock] = generateRandomPrice();
-  });
-  setPrices(newPrices);
-};
-
-useEffect(() => {
-  updatePrices();
-  const interval = setInterval(updatePrices, 1000);
-  return () => clearInterval(interval);
-}, [run]);
-
-
+  const updatePrices = () => {
+    const newPrices = {};
+    watchlistData.forEach((stock) => {
+      newPrices[stock] = generateRandomPrice();
+    });
+    setPrices(newPrices);
+  };
 
   useEffect(() => {
-      if (portfolio.statusCode && portfolio.statusCode.holdings) {
-        setData(portfolio.statusCode.holdings);
-          setinvested(portfolio.statusCode.totalInvestment)
-      }
+    updatePrices();
+    const interval = setInterval(updatePrices, 1000);
+    return () => clearInterval(interval);
+  }, [run, watchlistData]);
+
+  useEffect(() => {
+    if (portfolio.statusCode && portfolio.statusCode.holdings) {
+      setData(portfolio.statusCode.holdings);
+      setInvested(portfolio.statusCode.totalInvestment);
+    }
   }, [portfolio]);
 
   const newsRef = useRef(null);
@@ -77,10 +73,7 @@ useEffect(() => {
     };
 
     const scrollInterval = setInterval(scrollNews, scrollDelay);
-
-    return () => {
-      clearInterval(scrollInterval);
-    };
+    return () => clearInterval(scrollInterval);
   }, []);
 
   return (
@@ -92,10 +85,7 @@ useEffect(() => {
           style={{ whiteSpace: 'nowrap' }}
         >
           {stockMarketNews.map(news => (
-            <NewsItem
-              key={news.id}
-              headline={news.headline}
-            />
+            <NewsItem key={news.id} headline={news.headline} />
           ))}
         </div>
         <div className="portfoliofunc m-5 flex flex-col md:flex-row text-white gap-2">
@@ -103,6 +93,7 @@ useEffect(() => {
             <div>Investment</div>
             <div className="text-5xl">{invested}</div>
           </div>
+          {/* Uncomment if needed
           <div className="total w-full md:w-1/3 bg-violet-600 rounded-md p-4 shadow-violet-500 shadow-lg">
             <div>*Current Money</div>
             <div className="text-5xl">0</div>
@@ -111,19 +102,14 @@ useEffect(() => {
             <div>*Profit/Loss</div>
             <div className="text-5xl">+0</div>
           </div>
+          */}
         </div>
         <Chart />
       </div>
       <div className="w-full md:w-1/3">
-       {watchlistData.map((stock) => (
-
-
-                
-                  <Datait key={stock} symbol ={stock} companyName={stock} price={prices[stock]} data={data}/>
-
-                
-
-            ))}
+        {watchlistData.map((stock) => (
+          <Datait key={stock} symbol={stock} companyName={stock} price={prices[stock]} />
+        ))}
       </div>
     </div>
   );

@@ -2,8 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { BsFillPersonFill } from "react-icons/bs";
 import axios from 'axios';
-import { Link, useLocation } from "react-router-dom";
-
+import { Link } from "react-router-dom";
 
 const Signup = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -12,6 +11,7 @@ const Signup = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [loading, setLoading] = useState(false); // Loading state
   const navigate = useNavigate();
 
   const togglePasswordVisibility = () => {
@@ -25,6 +25,7 @@ const Signup = () => {
       return;
     }
 
+    setLoading(true); // Start loading
     try {
       const response = await axios.post('https://stockmarket-portfolio-backend.onrender.com/api/v1/users/register', {
         fullname,
@@ -35,14 +36,15 @@ const Signup = () => {
         withCredentials: true,
       });
 
-      console.log(response); 
+      console.log(response);
       alert("Signup successful");
-
       navigate('/signin');
 
     } catch (error) {
       console.error(error);
       alert("Signup failed");
+    } finally {
+      setLoading(false); // End loading
     }
   };
 
@@ -62,6 +64,7 @@ const Signup = () => {
             value={fullname}
             onChange={(e) => setFullname(e.target.value)}
             className="border border-gray-300 rounded-md p-2"
+            disabled={loading} // Disable input when loading
           />
         </div>
         <div className="email">
@@ -72,6 +75,7 @@ const Signup = () => {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             className="border border-gray-300 rounded-md p-2"
+            disabled={loading} // Disable input when loading
           />
         </div>
         <div className="username">
@@ -82,6 +86,7 @@ const Signup = () => {
             value={username}
             onChange={(e) => setUsername(e.target.value)}
             className="border border-gray-300 rounded-md p-2"
+            disabled={loading} // Disable input when loading
           />
         </div>
         <div className="password relative">
@@ -92,11 +97,13 @@ const Signup = () => {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             className="border border-gray-300 rounded-md p-2 w-full"
+            disabled={loading} // Disable input when loading
           />
           <button
             type="button"
             onClick={togglePasswordVisibility}
             className="absolute right-2 top-2 bg-transparent text-sm text-violet-500"
+            disabled={loading} // Disable button when loading
           >
             {showPassword ? 'Hide' : 'Show'}
           </button>
@@ -109,11 +116,13 @@ const Signup = () => {
             value={confirmPassword}
             onChange={(e) => setConfirmPassword(e.target.value)}
             className="border border-gray-300 rounded-md p-2 w-full"
+            disabled={loading} // Disable input when loading
           />
           <button
             type="button"
             onClick={togglePasswordVisibility}
             className="absolute right-2 top-2 bg-transparent text-sm text-violet-500"
+            disabled={loading} // Disable button when loading
           >
             {showPassword ? 'Hide' : 'Show'}
           </button>
@@ -122,15 +131,43 @@ const Signup = () => {
           <button
             type="submit"
             className='w-full bg-violet-500 text-white rounded-xl p-3'
+            disabled={loading} // Disable submit button when loading
           >
-            Signup
+            {loading ? (
+              <div className="flex justify-center items-center">
+                <svg
+                  className="animate-spin h-5 w-5 text-white mr-2"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                >
+                  <circle
+                    className="opacity-25"
+                    cx="12"
+                    cy="12"
+                    r="10"
+                    stroke="currentColor"
+                    strokeWidth="4"
+                  ></circle>
+                  <path
+                    className="opacity-75"
+                    fill="currentColor"
+                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                  ></path>
+                </svg>
+                Loading...
+              </div>
+            ) : (
+              "Signup"
+            )}
           </button>
         </div>
       </form>
-      <div className=" text-violet-500 pt-10">
-      <Link to="/signin">Log In</Link>      </div>
+      <div className="text-violet-500 pt-10">
+        <Link to="/signin">Log In</Link>
+      </div>
     </div>
   );
-}
+};
 
 export default Signup;
