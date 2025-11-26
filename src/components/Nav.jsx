@@ -1,30 +1,29 @@
 import React, { useState } from 'react';
-import { Link, useLocation } from "react-router-dom";
-import { useNavigate } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import axios from 'axios';
-import Searchbar from './searchbar';
+import Searchbar from './Searchbar';
 import Serchs from './Serchs';
-import Cookies from 'js-cookie';
 
 const Nav = ({ run, setRun }) => {
   const location = useLocation();
+  const navigate = useNavigate();
+  const token = localStorage.getItem('accessToken');
+
   const [results, setResults] = useState([]);
   const [showMenu, setShowMenu] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
-  const navigate = useNavigate();
-
-  const token = localStorage.getItem('accessToken');
 
   const handleLogout = async () => {
     try {
-      const response = await axios.post('https://stockmarket-portfolio-backend.onrender.com/api/v1/users/logout', null, {
-        headers: {
-          Authorization: `Bearer ${token}`
-        },
-        withCredentials: true
-      });
+      const response = await axios.post(
+        'http://localhost:4000/api/v1/users/logout',
+        null,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+          withCredentials: true,
+        }
+      );
 
-      console.log(response.data);
       alert("Logout successful");
       localStorage.removeItem('accessToken');
       navigate('/signin');
@@ -34,136 +33,130 @@ const Nav = ({ run, setRun }) => {
     }
   };
 
-  const handleAdd = async (stock) => {
+  const handleAdd = async (symbol) => {
     try {
-      const response = await fetch('https://stockmarket-portfolio-backend.onrender.com/api/v1/watchlist/add', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        credentials: 'include',
-        body: JSON.stringify({ stockSymbol: stock }),
-      });
-      if (!response.ok) {
-        throw new Error('Failed to add to watchlist');
-      }
-      const data = await response.json();
-      
+      const response = await fetch(
+        'http://localhost:4000/api/v1/watchlist/add',
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
+          credentials: 'include',
+          body: JSON.stringify({ stockSymbol: symbol }),
+        }
+      );
+
+      if (!response.ok) throw new Error('Failed to add to watchlist');
+
       setRun(!run);
-      console.log(run)
-    } catch (error) {
-      console.error('Error adding to watchlist:', error.message);
+      setShowMenu(false);
+    } catch (err) {
+      console.error("Add error:", err);
     }
   };
 
   return (
     <nav className="bg-white shadow-md">
       <div className="max-w-7xl mx-auto px-2 sm:px-6 lg:px-8">
-        <div className=" flex items-center justify-between h-16">
-          <div className=" inset-y-0 left-0  items-center sm:hidden">
-            
+
+        {/* NAV BAR */}
+        <div className="flex items-center justify-between h-16">
+          
+          {/* MOBILE MENU BUTTON */}
+          <div className="sm:hidden">
             <button
-              type="button"
-              className="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-white hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white"
-              aria-controls="mobile-menu"
-              aria-expanded="false"
+              className="p-2 rounded-md"
               onClick={() => setMenuOpen(!menuOpen)}
             >
-              <span className="sr-only">Open main menu</span>
-              {menuOpen ? (
-                <svg className="block h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              ) : (
-                <svg className="block h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16m-7 6h7" />
-                </svg>
-              )}
+              {menuOpen ? "✖" : "☰"}
             </button>
           </div>
-          <div className="flex-1 flex items-center justify-center sm:items-stretch sm:justify-start">
-            <div className="flex-shrink-0">
-              <h1 className="text-xl font-bold">Stock Market</h1>
-            </div>
-            <div className="hidden sm:block sm:ml-6">
-              <div className="flex space-x-4">
-                <Link
-                  to="/dashboard"
-                  className={`px-3 py-2 rounded-md text-sm font-medium ${location.pathname === '/dashboard' ? 'bg-gray-900 text-white' : 'text-gray-700 hover:bg-gray-700 hover:text-white'}`}
-                >
-                  Dashboard
-                </Link>
-                <Link
-                  to="/market"
-                  className={`px-3 py-2 rounded-md text-sm font-medium ${location.pathname === '/market' ? 'bg-gray-900 text-white' : 'text-gray-700 hover:bg-gray-700 hover:text-white'}`}
-                >
-                  Market
-                </Link>
-                <Link
-                  to="/portfolio"
-                  className={`px-3 py-2 rounded-md text-sm font-medium ${location.pathname === '/portfolio' ? 'bg-gray-900 text-white' : 'text-gray-700 hover:bg-gray-700 hover:text-white'}`}
-                >
-                  Portfolio
-                </Link>
-                <Link
-                  to="/news"
-                  className={`px-3 py-2 rounded-md text-sm font-medium ${location.pathname === '/news' ? 'bg-gray-900 text-white' : 'text-gray-700 hover:bg-gray-700 hover:text-white'}`}
-                >
-                  *News
-                </Link>
-              </div>
-            </div>
-          </div>
-          <div className=" inset-y-0 right-0 flex items-center pr-2  sm:inset-auto sm:ml-6 sm:pr-0 hidden sm:block">
-            <div className="flex items-center space-x-4 ">
-              <div className="">
-                <Searchbar setresult={setResults} setshowmenu={setShowMenu} />
-                {showMenu && (
-                  <div className=" mt-1 w-full rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 z-10">
-                    <Serchs results={results} setsybl={handleAdd} setShowMenu={setShowMenu} showMenu={showMenu} />
-                  </div>
-                )}
-              </div>
-              <Link onClick={handleLogout} className="bg-violet-500 text-white rounded-xl p-3 hidden sm:block ">
-                Log out
+
+          {/* WEBSITE NAME + LINKS */}
+          <div className="flex items-center">
+            <h1 className="text-xl font-bold mr-6">Stock Market</h1>
+
+            <div className="hidden sm:flex space-x-4">
+              <Link
+                to="/dashboard"
+                className={`${location.pathname === '/dashboard'
+                  ? 'bg-gray-900 text-white'
+                  : 'text-gray-700 hover:bg-gray-700 hover:text-white'
+                  } px-3 py-2 rounded-md`}
+              >
+                Dashboard
+              </Link>
+
+              <Link
+                to="/market"
+                className={`${location.pathname === '/market'
+                  ? 'bg-gray-900 text-white'
+                  : 'text-gray-700 hover:bg-gray-700 hover:text-white'
+                  } px-3 py-2 rounded-md`}
+              >
+                Market
+              </Link>
+
+              <Link
+                to="/portfolio"
+                className={`${location.pathname === '/portfolio'
+                  ? 'bg-gray-900 text-white'
+                  : 'text-gray-700 hover:bg-gray-700 hover:text-white'
+                  } px-3 py-2 rounded-md`}
+              >
+                Portfolio
+              </Link>
+
+              <Link
+                to="/news"
+                className={`${location.pathname === '/news'
+                  ? 'bg-gray-900 text-white'
+                  : 'text-gray-700 hover:bg-gray-700 hover:text-white'
+                  } px-3 py-2 rounded-md`}
+              >
+                News
               </Link>
             </div>
           </div>
+
+          {/* SEARCH + LOGOUT */}
+          <div className="hidden sm:flex items-center space-x-4">
+
+            {/* SEARCHBAR */}
+            <div className="relative w-64">
+              <Searchbar
+                setResults={setResults}
+                setShowMenu={setShowMenu}
+              />
+
+              {showMenu && results.length > 0 && (
+                <div className="absolute w-full mt-1 z-50">
+                  <Serchs results={results} setsybl={handleAdd} />
+                </div>
+              )}
+            </div>
+
+            {/* LOGOUT */}
+            <button
+              onClick={handleLogout}
+              className="bg-violet-500 text-white rounded-xl p-3"
+            >
+              Log out
+            </button>
+          </div>
+
         </div>
       </div>
 
+      {/* MOBILE MENU */}
       {menuOpen && (
-        <div className="sm:hidden" id="mobile-menu">
-          <div className="px-2 pt-2 pb-3 space-y-1">
-            <Link
-              to="/dashboard"
-              className={`block px-3 py-2 rounded-md text-base font-medium ${location.pathname === '/dashboard' ? 'bg-gray-900 text-white' : 'text-gray-700 hover:bg-gray-700 hover:text-white'}`}
-            >
-              Dashboard
-            </Link>
-            <Link
-              to="/market"
-              className={`block px-3 py-2 rounded-md text-base font-medium ${location.pathname === '/market' ? 'bg-gray-900 text-white' : 'text-gray-700 hover:bg-gray-700 hover:text-white'}`}
-            >
-              Market
-            </Link>
-            <Link
-              to="/portfolio"
-              className={`block px-3 py-2 rounded-md text-base font-medium ${location.pathname === '/portfolio' ? 'bg-gray-900 text-white' : 'text-gray-700 hover:bg-gray-700 hover:text-white'}`}
-            >
-              Portfolio
-            </Link>
-            <Link
-              to="/news"
-              className={`block px-3 py-2 rounded-md text-base font-medium ${location.pathname === '/news' ? 'bg-gray-900 text-white' : 'text-gray-700 hover:bg-gray-700 hover:text-white'}`}
-            >
-              *News
-            </Link>
-            <Link onClick={handleLogout} className="bg-violet-500 text-white rounded-xl p-3 hidden sm:block ">
-              Log out
-            </Link>
-          </div>
+        <div className="sm:hidden px-2 pb-3 space-y-1">
+          <Link to="/dashboard" className="block p-2">Dashboard</Link>
+          <Link to="/market" className="block p-2">Market</Link>
+          <Link to="/portfolio" className="block p-2">Portfolio</Link>
+          <Link to="/news" className="block p-2">News</Link>
         </div>
       )}
     </nav>

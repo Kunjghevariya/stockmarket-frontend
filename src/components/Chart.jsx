@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useMemo } from 'react';
 import { Line } from 'react-chartjs-2';
 import {
   Chart as ChartJS,
@@ -10,7 +10,7 @@ import {
   Tooltip,
   Legend,
 } from 'chart.js';
-import useportfolio from './ContextApi/portfolio';
+import { usePortfolioCtx } from '../context/PortfolioContext';
 
 ChartJS.register(
   CategoryScale,
@@ -23,54 +23,51 @@ ChartJS.register(
 );
 
 const Chart = () => {
-  const [portfolio] = useportfolio();  
-  const [chartData, setChartData] = useState(null);
+  const { portfolio } = usePortfolioCtx();
+  const holdings = portfolio?.statusCode?.holdings || [];
 
-  useEffect(() => {
-    if (portfolio.statusCode && portfolio.statusCode.holdings) {
-      const holdings = portfolio.statusCode.holdings;
-      const labels = holdings.map(e => e.symbol);
-      const data = holdings.map(e => e.purchasePrice);
+  const chartData = useMemo(() => {
+    if (!holdings.length) return null;
 
-      setChartData({
-        labels,
-        datasets: [
-          {
-            label: 'Portfolio Holdings',
-            data: data,
-            borderColor: 'rgb(75, 192, 192)',
-            backgroundColor: 'rgba(75, 192, 192, 0.2)',
-          },
-        ],
-      });
+    const labels = holdings.map(h => h.symbol);
+    const prices = holdings.map(h => h.purchasePrice);
 
-      console.log("Labels:", labels);
-      console.log("Data:", data);
-      console.log("Holdings:", holdings);
-      console.log("Total Investment:", portfolio.statusCode.totalInvestment);
-    }
-  }, [portfolio]);
+    return {
+      labels,
+      datasets: [
+        {
+          label: 'Portfolio Holdings',
+          data: prices,
+          borderColor: 'rgb(75, 192, 192)',
+          backgroundColor: 'rgba(75, 192, 192, 0.2)',
+          tension: 0.3,
+        },
+      ],
+    };
+  }, [holdings]);
 
-  const options = {
-    responsive: true,
-    plugins: {
-      legend: {
-        position: 'top',
+  const chartOptions = useMemo(
+    () => ({
+      responsive: true,
+      plugins: {
+        legend: { position: 'top' },
+        title: { display: true, text: 'Portfolio Overview' },
       },
-      title: {
-        display: true,
-        text: 'Portfolio Overview',
-      },
-    },
-  };
+    }),
+    []
+  );
 
   return (
-    <div className='bg-white rounded-md shadow-md m-4 p-4 md:p-10'>
-      <div className='overflow-x-auto'>
-        {chartData ? <Line options={options} data={chartData} /> : <p>Loading chart...</p>}
+    <div className="bg-white rounded-md shadow-md m-4 p-4 md:p-10">
+      <div className="overflow-x-auto">
+        {chartData ? (
+          <Line data={chartData} options={chartOptions} />
+        ) : (
+          <p>Loading chart...</p>
+        )}
       </div>
     </div>
   );
 };
 
-export default Chart;
+export default React.memo(Chart);

@@ -1,46 +1,61 @@
-import React from 'react'
-import { useState } from 'react';
+import React, { useState, useCallback } from 'react';
+import debounce from '../utils/debounce';
 
-function Searchbar({setresult,setshowmenu,showMenu}) {
- const [input, setinput] = useState("");
+function Searchbar({ setResults, setShowMenu }) {
+  const [input, setInput] = useState("");
 
- const fetchdata = (value)=>{
+  // Debounced API call
+  const fetchData = useCallback(
+    debounce(async (value) => {
+      if (!value.trim()) {
+        setResults([]);
+        setShowMenu(false);
+        return;
+      }
 
+      try {
+        const response = await fetch(`http://localhost:4000/api/v1/search?q=${value}`);
 
-	fetch(`https://apidojo-yahoo-finance-v1.p.rapidapi.com/auto-complete?q=${value}&region=IN`, {
-        method: 'GET',
-        headers: {
-          'x-rapidapi-key': 'e76dbecff5mshb31c0d084ee300fp193f62jsncc56175d94d4',
-		'x-rapidapi-host': 'apidojo-yahoo-finance-v1.p.rapidapi.com'
-        }
-      }).then((response) => response.json()).then((json)=>{
-        console.log(json);
-        setresult(json.quotes)
-      })
-      
+        const json = await response.json();
 
- }
- const handleSearch =(value)=>{
-    setinput(value);
-    fetchdata(value);
- }
- const handleMenuToggle = () => {
-  setshowmenu(!showMenu);
-};
-const handleClear = () => {
-  setshowmenu(false)
-  setinput("")
-}
- 
- 
+        // Your API returns an array directly
+        setResults(json || []);
+        setShowMenu(true);
+      } catch (err) {
+        console.error("Search API Error:", err);
+        setResults([]);
+      }
+    }, 300),
+    [setResults, setShowMenu]
+  );
+
+  const handleInput = (value) => {
+    setInput(value);
+    fetchData(value);
+  };
+
+  const clear = () => {
+    setInput("");
+    setResults([]);
+    setShowMenu(false);
+  };
 
   return (
-    <div className=''>
-    <input className='m-1 bg-neutral-100 p-2 rounded-md" type="text" placeholder="search' type="text" placeholder="Search" onFocus={handleMenuToggle} value={input} onChange={(e) =>{ handleSearch(e.target.value);
-      } } />
-      <button onClick={handleClear} className=' font-bold text-1xl mr-5' >X</button>
-</div>
-  )
+    <div className="flex items-center">
+      <input
+        className="m-1 bg-neutral-100 p-2 rounded-md w-full"
+        type="text"
+        placeholder="Search"
+        value={input}
+        onChange={(e) => handleInput(e.target.value)}
+        onFocus={() => setShowMenu(true)}
+      />
+
+      <button onClick={clear} className="font-bold text-xl mr-5">
+        X
+      </button>
+    </div>
+  );
 }
 
-export default Searchbar
+export default Searchbar;

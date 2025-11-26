@@ -1,11 +1,24 @@
+// src/main.jsx
 import React from 'react';
-import ReactDOM from 'react-dom/client';
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { createRoot } from 'react-dom/client';
+import { BrowserRouter } from 'react-router-dom';
 import App from './App';
 import './index.css';
 
-ReactDOM.createRoot(document.getElementById('root')).render(
-  <BrowserRouter>
-    <App />
-  </BrowserRouter>
+import { AuthProvider } from './context/AuthContext';
+import { WatchlistProvider } from './context/WatchlistContext';
+import { PortfolioProvider } from './context/PortfolioContext';
+
+createRoot(document.getElementById('root')).render(
+  <React.StrictMode>
+    <AuthProvider>
+      <WatchlistProvider>
+        <PortfolioProvider>
+          <BrowserRouter>
+            <App />
+          </BrowserRouter>
+        </PortfolioProvider>
+      </WatchlistProvider>
+    </AuthProvider>
+  </React.StrictMode>
 );

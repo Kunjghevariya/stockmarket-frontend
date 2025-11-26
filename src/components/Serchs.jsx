@@ -1,20 +1,14 @@
-import React from 'react'
-import Search from './search'
+import React from 'react';
+import Search from './Search';
 
-
-const Serchs = ({results, setsybl}) => {
-  
-    
+const Serchs = ({ results, setsybl }) => {
   return (
-    <div className="searchs rounded-lg absolute w-72  bg-white text-black overflow-scroll z-10">
-      
-        {results.map((result, id) => (
-    
-        <Search  result={result} key={id} setsybl={setsybl} />
+    <div className="bg-white border rounded-md shadow-md max-h-60 overflow-auto">
+      {results.map((result, idx) => (
+        <Search key={idx} result={result} setsybl={setsybl} />
       ))}
-
     </div>
-  )
-}
+  );
+};
 
-export default Serchs
+export default React.memo(Serchs);
