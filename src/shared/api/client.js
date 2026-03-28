@@ -1,4 +1,4 @@
-const API_BASE_URL = import.meta.env.VITE_API_BASE || 'http://localhost:4000';
+const API_BASE_URL = import.meta.env.VITE_API_BASE || 'https://stockmarket-portfolio-backend.onrender.com';
 const ACCESS_TOKEN_KEY = 'accessToken';
 
 export function getStoredAccessToken() {
