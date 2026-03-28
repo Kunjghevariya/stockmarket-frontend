@@ -2,7 +2,64 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  color-scheme: light;
+  --bg: #f6f8fc;
+  --surface: rgba(255, 255, 255, 0.88);
+  --surface-strong: #ffffff;
+  --border: rgba(15, 23, 42, 0.08);
+  --text: #0f172a;
+  --muted: #64748b;
+  --brand: #0f766e;
+  --brand-strong: #115e59;
+  --danger: #dc2626;
+}
 
-body{
-  background-color: rgb(235, 235, 235);
+html {
+  font-family:
+    'Sora',
+    'Segoe UI',
+    sans-serif;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  color: var(--text);
+  background:
+    radial-gradient(circle at top left, rgba(20, 184, 166, 0.12), transparent 24rem),
+    radial-gradient(circle at top right, rgba(59, 130, 246, 0.12), transparent 22rem),
+    linear-gradient(180deg, #f8fbff 0%, #eef3f9 100%);
+}
+
+#root {
+  min-height: 100vh;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+button,
+input,
+textarea,
+select {
+  font: inherit;
+}
+
+.glass-panel {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  box-shadow:
+    0 16px 40px rgba(15, 23, 42, 0.06),
+    inset 0 1px 0 rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(12px);
+}
+
+.section-title {
+  @apply text-lg font-semibold text-slate-900;
+}
+
+.section-copy {
+  @apply text-sm text-slate-500;
 }

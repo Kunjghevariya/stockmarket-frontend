@@ -5,8 +5,16 @@ export default defineConfig({
   plugins: [react()],
   server: {
     host: true,
-    hmr: {
-      host: '192.168.1.6',
+  },
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          react: ['react', 'react-dom'],
+          router: ['react-router-dom'],
+          charts: ['chart.js', 'react-chartjs-2'],
+        },
+      },
     },
   },
 });
